@@ -31,4 +31,23 @@ App::uses('Controller', 'Controller');
  * @link		https://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
+    public function responseAsJSON($object)
+    {
+        $object=$this->forceUTF8Object($object);
+        $json=json_encode($object,true);
+        $this->response->body($json);
+        $this->response->type('application/json');
+        return $json;
+    }
+    public function forceUTF8Object($mixed)
+    {
+        if(is_array($mixed)){
+            foreach($mixed as $key=>$value){
+                $mixed[$key]=$this->forceUTF8Object($value);
+            }
+        }
+        elseif(is_string($mixed))
+            return mb_convert_encoding($mixed,"UTF-8","UTF-8");
+        return $mixed;
+    }
 }
